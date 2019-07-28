@@ -1,0 +1,23 @@
+{
+	"compilerOptions" : {
+		"target" : "ES2017",
+		"module" : "commonjs",
+		"outDir" : "dist",
+		"sourceMap" : true,
+        "alwaysStrict" : true,
+        "strictNullChecks": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl" : "./src",
+        "declaration": true,
+	},
+	// "files" : [ ]
+	"include" : [
+		"src/**/*.ts"
+	],
+	"exclude" : [
+		"node_modules",
+        "./src/env.sample.ts",
+        "./src/example.ts",
+    ],
+}
+

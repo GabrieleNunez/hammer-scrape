@@ -1,3 +1,4 @@
+# Add any directories, files, or patterns you don't want to be tracked by version control
 # Logs
 logs
 *.log
@@ -56,6 +57,23 @@ typings/
 
 # dotenv environment variables file
 .env
+env.js
 
 # next.js build output
 .next
+
+
+/dist
+env.ts
+
+/Partitions
+
+.vs/
+.vscode/
+*.sln
+ts-node-*/
+browserdata/*
+BrowserCache/*
+/BrowserCache
+
+example.ts

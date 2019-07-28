@@ -1,0 +1,33 @@
+{
+  "name": "hammer-scrape",
+  "version": "1.0.0",
+  "description": "Unifies Cheerio and Puppeteer for the most streamline scraping experience",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrieleNunez/hammer-scrape.git"
+  },
+  "author": "Gabriele M. Nunez",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GabrieleNunez/hammer-scrape/issues"
+  },
+  "homepage": "https://github.com/GabrieleNunez/hammer-scrape#readme",
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "prettier": "^1.18.2",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "request-group": "^1.1.0",
+    "request-group-cheerio": "^1.1.0",
+    "request-group-puppeteer": "^1.0.11"
+  }
+}
