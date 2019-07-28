@@ -3,8 +3,11 @@
  * ONLY ONE MODE can be used at one time
  */
 export enum EngineMode {
-    Parse = 1,
-    Manipulate = 2,
+    Off = 0,
+    Loading = 1,
+    Idling = 2,
+    Parsing = 3,
+    Manipulating = 4,
 }
 
 export default EngineMode;
