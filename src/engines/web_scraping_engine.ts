@@ -2,11 +2,19 @@ import EngineMode from './engine_mode';
 import EngineType from './engine_type';
 import EngineCoreType from './engine_core_type';
 
+/**
+ * A standardized abstract class that represents what we want in our web scraping engines.
+ */
 export abstract class WebScrapingEngine {
     private readonly engineType: EngineType;
     private readonly engineCore: EngineCoreType;
     private engineMode: EngineMode;
 
+    /**
+     * Construct our basic implementation of our engine
+     * @param engineType The type of engine we are aiming for
+     * @param engineCoreType The core type that we want to utilize
+     */
     public constructor(engineType: EngineType, engineCoreType: EngineCoreType) {
         this.engineType = engineType;
         this.engineCore = engineCoreType;
@@ -161,3 +169,5 @@ export interface ParsingEngine<PageCore> {
     // gets the direct page core for more advanced usage
     getParsingCore(): PageCore;
 }
+
+export default WebScrapingEngine;
