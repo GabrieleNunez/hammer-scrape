@@ -2,11 +2,27 @@ import { CheerioRequest } from 'request-group-cheerio';
 import { ParsingCore } from '../web_scraping_engine';
 import { CoreNotInitializedError } from 'core_errors';
 
-interface ExpectedLoadingFields {
+/**
+ * The fields we expect to pass into our intitialize method.
+ */
+export interface CheerioParsingCoreConfiguration {
     header?: string;
+    xml?: boolean;
 }
 
-export class CheerioParsingCore extends ParsingCore<CheerioStatic, ExpectedLoadingFields> {
+/**
+ * A set of default configuration options to use for the cheerio parsing core
+ */
+export const CHEERIO_PARSING_CORE_DEFAULT: CheerioParsingCoreConfiguration = {
+    xml: false,
+    header: undefined,
+};
+
+/**
+ * A basic cheerio parsing core.
+ * This is very likely the fasest core for parsing that's reliable
+ */
+export class CheerioParsingCore extends ParsingCore<CheerioStatic, CheerioParsingCoreConfiguration> {
     private request: CheerioRequest | null;
     private initialized: boolean;
     public constructor(url: string) {
@@ -22,7 +38,7 @@ export class CheerioParsingCore extends ParsingCore<CheerioStatic, ExpectedLoadi
         });
     }
 
-    public initialize(data?: ExpectedLoadingFields): Promise<void> {
+    public initialize(data: CheerioParsingCoreConfiguration = CHEERIO_PARSING_CORE_DEFAULT): Promise<void> {
         return new Promise((resolve): void => {
             if (this.isInitialized()) {
                 resolve();
