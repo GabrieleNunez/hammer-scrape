@@ -192,16 +192,51 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
     public abstract initialize(data: ExpectedInitializeObjectType): Promise<void>;
 
     // getting text methods
+    /**
+     * Gets the text off the desired selector.
+     * Note: If the selector finds more the one, this method will only return the very first text contents
+     */
     public abstract getText(querySelector: string): Promise<string>;
+
+    /**
+     * Get the text from the desired selector.
+     * This variation always returns an array, so this is multi element friendly
+     */
     public abstract getTextAll(querySelector: string): Promise<string[]>;
 
-    // attribute methods
+    /**
+     * Gets the attribute value off the selector with the specified attribute name.
+     * Note: If there selector finds more then one element, this method will only return the very first attribute value
+     */
     public abstract getAttribute(querySelector: string, attributeName: string): Promise<string>;
+
+    /**
+     * Gets the attribute value off the selector with the specified attribute name.
+     * This method is multi element friendly, it will always return an array of attribute values that match the attribute name
+     */
     public abstract getAttributeAll(querySelector: string, attributeName: string): Promise<string[]>;
 
-    // html methods
+    /**
+     * Gets the html off the selector.
+     * This method only works on the very first element found that matches the selector
+     */
     public abstract getHtml(querySelector: string): Promise<string>;
+
+    /**
+     * Gets the html off the elememts that match the selector.
+     * This method is multi element friendly
+     */
     public abstract getHtmlAll(querySelector: string): Promise<string[]>;
+
+    /**
+     * Determines if an element does exist on the current DOM Tree
+     */
+    public abstract elementExist(querySelector: string): Promise<boolean>;
+
+    /**
+     * Counts the total amount of elements that match the selector
+     */
+    public abstract elementCount(querySelector: string): Promise<number>;
 
     /**
      * Gets all the option elements that can be found in the select element mathing the query selector

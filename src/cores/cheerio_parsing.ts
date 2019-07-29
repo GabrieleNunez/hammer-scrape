@@ -23,8 +23,12 @@ export const CHEERIO_PARSING_CORE_DEFAULT: CheerioParsingCoreConfiguration = {
  * This is very likely the fasest core for parsing that's reliable
  */
 export class CheerioParsingCore extends ParsingCore<CheerioStatic, CheerioParsingCoreConfiguration> {
+    // the request that we are intending to make with this core.  Can be null if not initialized
     private request: CheerioRequest | null;
+
+    // holds a boolean value that should be set to true when this core is initialized
     private initialized: boolean;
+
     public constructor(url: string) {
         super(url);
         this.request = null;
@@ -171,6 +175,29 @@ export class CheerioParsingCore extends ParsingCore<CheerioStatic, CheerioParsin
                         });
                     });
                 resolve(selectOptions);
+            });
+        } else {
+            throw new CoreNotInitializedError();
+        }
+    }
+
+    public elementExist(querySelector: string): Promise<boolean> {
+        if (this.isInitialized()) {
+            return new Promise((resolve): void => {
+                this.elementCount(querySelector).then((totalCount: number): void => {
+                    resolve(totalCount > 0 ? true : false);
+                });
+            });
+        } else {
+            throw new CoreNotInitializedError();
+        }
+    }
+
+    public elementCount(querySelector: string): Promise<number> {
+        if (this.isInitialized()) {
+            return new Promise((resolve): void => {
+                let totalCount: number = this.raw()(querySelector).length;
+                resolve(totalCount);
             });
         } else {
             throw new CoreNotInitializedError();
