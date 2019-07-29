@@ -212,3 +212,5 @@ export class CheerioParsingCore extends ParsingCore<CheerioStatic, CheerioParsin
         }
     }
 }
+
+export default CheerioParsingCore;
