@@ -6,6 +6,10 @@ interface ExpectedLoadingFields {
 }
 
 export class CheerioParsingCore extends ParsingCore<CheerioStatic, ExpectedLoadingFields> {
+    public constructor(url: string) {
+        super(url);
+    }
+
     public dispose(): Promise<void> {
         throw new Error('Method not implemented.');
     }

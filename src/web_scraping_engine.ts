@@ -108,6 +108,7 @@ export abstract class WebScrapingEngine {
 }
 
 export interface Core<PageType, ExpectedInitializeObjectType> {
+    getUrl(): string;
     raw(): PageType;
     initialize(data: ExpectedInitializeObjectType): Promise<void>;
     dispose(): Promise<void>;
@@ -120,9 +121,15 @@ export abstract class ManipulationCore<PageType, ExpectedInitializeObjectType>
     implements Core<PageType, ExpectedInitializeObjectType> {
     /** This core provides methods to actually manipulate the page. But it can be null if the core has not been initialized yet */
     private core: PageType | null;
+    private url: string;
 
-    public constructor() {
+    public constructor(url: string) {
         this.core = null;
+        this.url = url;
+    }
+
+    public getUrl(): string {
+        return this.url;
     }
 
     /**
@@ -167,9 +174,15 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
     implements Core<PageType, ExpectedInitializeObjectType> {
     /** This core provides methods to actually manipulate the page. But it can be null if the core has not been initialized yet */
     private core: PageType | null;
+    private url: string;
 
-    public constructor() {
+    public constructor(url: string) {
         this.core = null;
+        this.url = url;
+    }
+
+    public getUrl(): string {
+        return this.url;
     }
 
     /**
