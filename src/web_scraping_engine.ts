@@ -107,57 +107,94 @@ export abstract class WebScrapingEngine {
     public abstract shutoff(): Promise<void>;
 }
 
+export interface Core<PageType, ExpectedInitializeObjectType> {
+    raw(): PageType;
+    initialize(data: ExpectedInitializeObjectType): Promise<void>;
+    dispose(): Promise<void>;
+}
+
 /**
- * Defines the methods that should be implemented in an engine that supports manipulation
+ * Defines the methods that should be implemented in a core that handles manipulation
  */
-export interface ManipulationEngine<PageCore> {
+export abstract class ManipulationCore<PageType, ExpectedInitializeObjectType>
+    implements Core<PageType, ExpectedInitializeObjectType> {
+    /** This core provides methods to actually manipulate the page. But it can be null if the core has not been initialized yet */
+    private core: PageType | null;
+
+    public constructor() {
+        this.core = null;
+    }
+
+    /**
+     * Initialize and load in anything for the core
+     * @param data Based on what was specified with the manipulation core design, this data allows us to properly initialize whatever core design we want
+     */
+    public abstract initialize(data: ExpectedInitializeObjectType): Promise<void>;
+
     /**
      * Set the value into the select element
      * @param querySelector The selector that targets the select element
      * @param value The value to attempt to set
      */
-    select(querySelector: string, value: string): Promise<void>;
+    public abstract select(querySelector: string, value: string): Promise<void>;
 
     /**
      * Click on the element that matches the query selector
      * @param querySelector The selector that targets the element we want to click
      */
-    click(querySelector: string): Promise<void>;
+    public abstract click(querySelector: string): Promise<void>;
 
     /**
      * Type a specific value into the field that can accept typing.
      * @param querySelector The element(s) that we are targeting
      * @param value The value we want to simulate typing in
      */
-    type(querySelector: string, value: string): Promise<void>;
+    public abstract type(querySelector: string, value: string): Promise<void>;
 
     /**
-     * Gets the raw page core used for manipulating
+     * Gets the raw page access method used for manipulating
      */
-    getManipulationCore(): PageCore;
+    public abstract raw(): PageType;
+
+    /** Frees up any resources */
+    public abstract dispose(): Promise<void>;
 }
 
 /**
  * Defines the methods that should be implemented in an engine that supports parsing the page
  */
-export interface ParsingEngine<PageCore> {
+export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
+    implements Core<PageType, ExpectedInitializeObjectType> {
+    /** This core provides methods to actually manipulate the page. But it can be null if the core has not been initialized yet */
+    private core: PageType | null;
+
+    public constructor() {
+        this.core = null;
+    }
+
+    /**
+     * Initialize and load in anything for the core
+     * @param data Based on what was specified with the manipulation core design, this data allows us to properly initialize whatever core design we want
+     */
+    public abstract initialize(data: ExpectedInitializeObjectType): Promise<void>;
+
     // getting text methods
-    getText(querySelector: string): Promise<string>;
-    getTextAll(querySelector: string): Promise<string[]>;
+    public abstract getText(querySelector: string): Promise<string>;
+    public abstract getTextAll(querySelector: string): Promise<string[]>;
 
     // attribute methods
-    getAttribute(querySelector: string, attributeName: string): Promise<string>;
-    getAttributeAll(querySelector: string, attributeName: string): Promise<string[]>;
+    public abstract getAttribute(querySelector: string, attributeName: string): Promise<string>;
+    public abstract getAttributeAll(querySelector: string, attributeName: string): Promise<string[]>;
 
     // html methods
-    getHtml(querySelector: string): Promise<string>;
-    getHtmlAll(querySelector: string): Promise<string>;
+    public abstract getHtml(querySelector: string): Promise<string>;
+    public abstract getHtmlAll(querySelector: string): Promise<string>;
 
     /**
      * Gets all the option elements that can be found in the select element mathing the query selector
      * @param querySelector The query selector that targets the select element
      */
-    getSelectOptions(
+    public abstract getSelectOptions(
         querySelector: string,
     ): Promise<
         {
@@ -167,7 +204,10 @@ export interface ParsingEngine<PageCore> {
     >;
 
     // gets the direct page core for more advanced usage
-    getParsingCore(): PageCore;
+    public abstract raw(): PageType;
+
+    /** Frees up any resources */
+    public abstract dispose(): Promise<void>;
 }
 
 export default WebScrapingEngine;
