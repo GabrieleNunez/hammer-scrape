@@ -211,7 +211,7 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
         querySelector: string,
     ): Promise<
         {
-            key: string;
+            text: string;
             value: string;
         }[]
     >;

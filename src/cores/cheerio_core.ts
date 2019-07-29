@@ -138,8 +138,27 @@ export class CheerioParsingCore extends ParsingCore<CheerioStatic, ExpectedLoadi
             throw new CoreNotInitializedError();
         }
     }
-    public getSelectOptions(querySelector: string): Promise<{ key: string; value: string }[]> {
-        throw new Error('Method not implemented.');
+
+    public getSelectOptions(querySelector: string): Promise<{ text: string; value: string }[]> {
+        if (this.isInitialized()) {
+            return new Promise((resolve): void => {
+                let selectOptions: { text: string; value: string }[] = [];
+                let $: CheerioStatic = this.raw();
+                $(querySelector)
+                    .find(querySelector)
+                    .each((index: number, element: CheerioElement): void => {
+                        selectOptions.push({
+                            text: $(element)
+                                .text()
+                                .trim(),
+                            value: $(element).val(),
+                        });
+                    });
+                resolve(selectOptions);
+            });
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
 
     public raw(): CheerioStatic {
