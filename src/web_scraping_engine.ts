@@ -120,7 +120,7 @@ export interface Core<PageType, ExpectedInitializeObjectType> {
 export abstract class ManipulationCore<PageType, ExpectedInitializeObjectType>
     implements Core<PageType, ExpectedInitializeObjectType> {
     /** This core provides methods to actually manipulate the page. But it can be null if the core has not been initialized yet */
-    private core: PageType | null;
+    protected core: PageType | null;
     private url: string;
 
     public constructor(url: string) {
@@ -173,7 +173,7 @@ export abstract class ManipulationCore<PageType, ExpectedInitializeObjectType>
 export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
     implements Core<PageType, ExpectedInitializeObjectType> {
     /** This core provides methods to actually manipulate the page. But it can be null if the core has not been initialized yet */
-    private core: PageType | null;
+    protected core: PageType | null;
     private url: string;
 
     public constructor(url: string) {
@@ -201,7 +201,7 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
 
     // html methods
     public abstract getHtml(querySelector: string): Promise<string>;
-    public abstract getHtmlAll(querySelector: string): Promise<string>;
+    public abstract getHtmlAll(querySelector: string): Promise<string[]>;
 
     /**
      * Gets all the option elements that can be found in the select element mathing the query selector
