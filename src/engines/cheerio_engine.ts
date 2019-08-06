@@ -2,25 +2,44 @@ import { WebScrapingEngine } from '../web_scraping_engine';
 import EngineType from '../engine_type';
 import EngineCoreType from '../engine_core_type';
 import CheerioParsingCore from '../cores/cheerio_parsing';
+import EngineMode from 'engine_mode';
 
-export class CheerioEngine extends WebScrapingEngine {
-    private core: CheerioParsingCore | null;
-
+export class CheerioEngine extends WebScrapingEngine<CheerioParsingCore, null> {
     public constructor() {
         super(EngineType.Fixed, EngineCoreType.Cheerio);
-        this.core = null;
     }
 
     protected load(): Promise<void> {
-        throw new Error('Method not implemented.');
+        return new Promise((resolve): void => {
+            this.setEngineMode(EngineMode.Loading);
+            this.parsingCore = null;
+            this.manipulationCore = null;
+            this.setEngineMode(EngineMode.Idling);
+            resolve();
+        });
     }
 
     public process(url: string): Promise<void> {
-        throw new Error('Method not implemented.');
+        return new Promise(
+            async (resolve): Promise<void> => {
+                this.setEngineMode(EngineMode.Loading);
+                let cheerioCore: CheerioParsingCore = new CheerioParsingCore(url);
+                cheerioCore.initialize({
+                    xml: false,
+                    header: undefined,
+                });
+                this.parsingCore = cheerioCore;
+                this.setEngineMode(EngineMode.Idling);
+                resolve();
+            },
+        );
     }
 
     public shutoff(): Promise<void> {
-        throw new Error('Method not implemented.');
+        return new Promise((resolve): void => {
+            this.setEngineMode(EngineMode.Off);
+            resolve();
+        });
     }
 }
 

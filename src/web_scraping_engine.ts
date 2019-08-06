@@ -1,14 +1,17 @@
 import EngineMode from './engine_mode';
 import EngineType from './engine_type';
 import EngineCoreType from './engine_core_type';
+import { EngineCannotSwitchModeError, EngineModeError } from 'engine_errors';
 
 /**
  * A standardized abstract class that represents what we want in our web scraping engines.
  */
-export abstract class WebScrapingEngine {
+export abstract class WebScrapingEngine<PCore, MCore> {
     private readonly engineType: EngineType;
     private readonly engineCore: EngineCoreType;
     private engineMode: EngineMode;
+    protected parsingCore: PCore | null;
+    protected manipulationCore: MCore | null;
 
     /**
      * Construct our basic implementation of our engine
@@ -19,6 +22,8 @@ export abstract class WebScrapingEngine {
         this.engineType = engineType;
         this.engineCore = engineCoreType;
         this.engineMode = EngineMode.Off;
+        this.parsingCore = null;
+        this.manipulationCore = null;
     }
 
     // any method that we want to relay information back should go here
@@ -105,6 +110,60 @@ export abstract class WebScrapingEngine {
      * Shut the engine off and free up any resources
      */
     public abstract shutoff(): Promise<void>;
+
+    /**
+     * Get the parsing core that we have decided to utilize
+     */
+    public getParsingCore(): PCore | null {
+        return this.parsingCore;
+    }
+
+    /**
+     * Get the manipulation core that we have decided to utilize
+     */
+    public getManipulationCore(): MCore | null {
+        return this.manipulationCore;
+    }
+
+    /**
+     * Safely enters manipulation mode
+     * @param callback Let's you safely manipulate the page this engine is processing
+     */
+    public manipulate(callback: (core: MCore) => Promise<void>): Promise<void> {
+        if (this.getEngineMode() === EngineMode.Idling) {
+            return new Promise((resolve): void => {
+                this.setEngineMode(EngineMode.Manipulating);
+                callback(this.getManipulationCore() as MCore).then((): void => {
+                    this.setEngineMode(EngineMode.Idling);
+                    resolve();
+                });
+            });
+        } else if (this.manipulationCore === null) {
+            throw new EngineModeError('There is no manipulation core defined or created');
+        } else {
+            throw new EngineCannotSwitchModeError();
+        }
+    }
+
+    /**
+     * Provides a mechanism to safely parse the core contents
+     * @param callback This is where you will be able to safely parse the contents
+     */
+    public parse(callback: (core: PCore) => Promise<void>): Promise<void> {
+        if (this.getEngineMode() === EngineMode.Idling) {
+            return new Promise((resolve): void => {
+                this.setEngineMode(EngineMode.Parsing);
+                callback(this.getParsingCore() as PCore).then((): void => {
+                    this.setEngineMode(EngineMode.Idling);
+                    resolve();
+                });
+            });
+        } else if (this.parsingCore === null) {
+            throw new EngineModeError('There is no parsing core defined or created');
+        } else {
+            throw new EngineCannotSwitchModeError();
+        }
+    }
 }
 
 export interface Core<PageType, ExpectedInitializeObjectType> {
