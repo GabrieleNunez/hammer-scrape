@@ -21,6 +21,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
     private request: PuppeteerRequest | null;
     private manager: PuppeteerManager;
     private initialized: boolean;
+    private reserved: unknown;
 
     public constructor(url: string) {
         super(url);
@@ -30,16 +31,18 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
             width: 1920,
             height: 1080,
         });
+        this.reserved = null;
     }
 
     private isInitialized(): boolean {
         return this.initialized;
     }
 
-    public initialize(data: PuppeteerParsingCoreConfiguration): Promise<void> {
+    public initialize(data: PuppeteerParsingCoreConfiguration = PUPPETEER_PARSING_CORE_DEFAULT): Promise<void> {
         return new Promise(
             async (resolve): Promise<void> => {
                 await this.manager.initialize();
+                this.reserved = data.reserved;
                 resolve();
             },
         );
