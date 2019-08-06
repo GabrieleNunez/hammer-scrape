@@ -1,4 +1,4 @@
-import EngineMode from 'engine_mode';
+import EngineMode from './engine_mode';
 
 /**
  * A generimc core error
