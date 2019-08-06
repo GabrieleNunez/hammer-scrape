@@ -83,7 +83,7 @@ export abstract class WebScrapingEngine<PCore, MCore> {
     public startup(): Promise<void> {
         return new Promise(
             async (resolve): Promise<void> => {
-                if (this.isCorrectEngineMode(EngineMode.Off) === false) {
+                if (this.isCorrectEngineMode(EngineMode.Off)) {
                     // switch to loading mode and then load anything we have to load in
                     this.setEngineMode(EngineMode.Loading);
                     await this.load();
@@ -130,7 +130,7 @@ export abstract class WebScrapingEngine<PCore, MCore> {
      * @param callback Let's you safely manipulate the page this engine is processing
      */
     public manipulate(callback: (core: MCore) => Promise<void>): Promise<void> {
-        if (this.getEngineMode() === EngineMode.Idling) {
+        if (this.isCorrectEngineMode(EngineMode.Idling)) {
             return new Promise((resolve): void => {
                 this.setEngineMode(EngineMode.Manipulating);
                 callback(this.getManipulationCore() as MCore).then((): void => {
@@ -150,7 +150,7 @@ export abstract class WebScrapingEngine<PCore, MCore> {
      * @param callback This is where you will be able to safely parse the contents
      */
     public parse(callback: (core: PCore) => Promise<void>): Promise<void> {
-        if (this.getEngineMode() === EngineMode.Idling) {
+        if (this.isCorrectEngineMode(EngineMode.Idling)) {
             return new Promise((resolve): void => {
                 this.setEngineMode(EngineMode.Parsing);
                 callback(this.getParsingCore() as PCore).then((): void => {

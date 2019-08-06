@@ -12,21 +12,19 @@ export class CheerioEngine extends WebScrapingEngine<CheerioParsingCore, null> {
 
     protected load(): Promise<void> {
         return new Promise((resolve): void => {
-            this.setEngineMode(EngineMode.Loading);
             this.parsingCore = null;
             this.manipulationCore = null;
-            this.setEngineMode(EngineMode.Idling);
             resolve();
         });
     }
 
     public process(url: string): Promise<void> {
-        if (this.getEngineMode() === EngineMode.Idling) {
+        if (this.isCorrectEngineMode(EngineMode.Idling)) {
             return new Promise(
                 async (resolve): Promise<void> => {
                     this.setEngineMode(EngineMode.Loading);
                     let cheerioCore: CheerioParsingCore = new CheerioParsingCore(url);
-                    cheerioCore.initialize({
+                    await cheerioCore.initialize({
                         xml: false,
                         header: undefined,
                     });
