@@ -77,3 +77,4 @@ BrowserCache/*
 /BrowserCache
 
 example.ts
+examples/

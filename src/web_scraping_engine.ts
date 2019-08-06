@@ -1,7 +1,7 @@
 import EngineMode from './engine_mode';
 import EngineType from './engine_type';
 import EngineCoreType from './engine_core_type';
-import { EngineCannotSwitchModeError, EngineModeError } from 'engine_errors';
+import { EngineCannotSwitchModeError, EngineModeError } from './engine_errors';
 
 /**
  * A standardized abstract class that represents what we want in our web scraping engines.
@@ -60,7 +60,7 @@ export abstract class WebScrapingEngine<PCore, MCore> {
      * The engine should only be in one mode at a time. Either Parsing or manipulating
      * @param newMode The new mode that we want to lock the engine into
      */
-    public setEngineMode(newMode: EngineMode): void {
+    protected setEngineMode(newMode: EngineMode): void {
         this.engineMode = newMode;
     }
 

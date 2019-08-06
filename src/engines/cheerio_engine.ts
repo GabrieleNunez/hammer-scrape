@@ -2,8 +2,8 @@ import { WebScrapingEngine } from '../web_scraping_engine';
 import EngineType from '../engine_type';
 import EngineCoreType from '../engine_core_type';
 import CheerioParsingCore from '../cores/cheerio_parsing';
-import EngineMode from 'engine_mode';
-import { EngineCannotSwitchModeError } from 'engine_errors';
+import EngineMode from '../engine_mode';
+import { EngineCannotSwitchModeError } from '../engine_errors';
 
 export class CheerioEngine extends WebScrapingEngine<CheerioParsingCore, null> {
     public constructor() {

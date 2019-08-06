@@ -1,6 +1,6 @@
 import { CheerioRequest } from 'request-group-cheerio';
 import { ParsingCore } from '../web_scraping_engine';
-import { CoreNotInitializedError } from 'core_errors';
+import { CoreNotInitializedError } from '../core_errors';
 
 /**
  * The fields we expect to pass into our intitialize method.
