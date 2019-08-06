@@ -1,6 +1,6 @@
-import { PuppeteerRequest } from 'request-group-puppeteer';
+import { PuppeteerRequest, PuppeteerManager } from 'request-group-puppeteer';
 import { ParsingCore } from '../web_scraping_engine';
-import { CoreNotInitializedError } from '../core_errors';
+import { CoreNotInitializedError, CoreError } from '../core_errors';
 import * as puppeteer from 'puppeteer';
 
 /**
@@ -18,15 +18,78 @@ export const PUPPETEER_PARSING_CORE_DEFAULT: PuppeteerParsingCoreConfiguration =
 };
 
 export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerParsingCoreConfiguration> {
+    private request: PuppeteerRequest | null;
+    private manager: PuppeteerManager;
+    private initialized: boolean;
+
+    public constructor(url: string) {
+        super(url);
+        this.request = null;
+        this.initialized = false;
+        this.manager = new PuppeteerManager({
+            width: 1920,
+            height: 1080,
+        });
+    }
+
+    private isInitialized(): boolean {
+        return this.initialized;
+    }
+
     public initialize(data: PuppeteerParsingCoreConfiguration): Promise<void> {
-        throw new Error('Method not implemented.');
+        return new Promise(
+            async (resolve): Promise<void> => {
+                await this.manager.initialize();
+                resolve();
+            },
+        );
     }
+
     public getText(querySelector: string): Promise<string> {
-        throw new Error('Method not implemented.');
+        return new Promise(
+            async (resolve): Promise<void> => {
+                let elementText: string = (await (this.request as PuppeteerRequest)
+                    .getPage()
+                    .evaluate(function(selector: string): Promise<string> {
+                        return new Promise((evalResolve): void => {
+                            let resultText = '';
+                            let elementResult: Element | null = document.querySelector(selector);
+                            if (elementResult) {
+                                resultText = elementResult.textContent ? elementResult.textContent.trim() : '';
+                            } else {
+                                resultText = '';
+                            }
+                            evalResolve(resultText);
+                        });
+                    }, querySelector)) as string;
+                resolve(elementText);
+            },
+        );
     }
+
     public getTextAll(querySelector: string): Promise<string[]> {
-        throw new Error('Method not implemented.');
+        return new Promise(
+            async (resolve): Promise<void> => {
+                let elementTexts: string[] = (await (this.request as PuppeteerRequest)
+                    .getPage()
+                    .evaluate(function(selector: string): Promise<string[]> {
+                        return new Promise((evalResolve): void => {
+                            let resultText: string[] = [];
+                            let elements: NodeListOf<Element> | null = document.querySelectorAll(selector);
+                            for (var i = 0; i < elements.length; i++) {
+                                let element: Element = elements[i];
+                                if (element.textContent && element.textContent.trim().length > 0) {
+                                    resultText.push(element.textContent.trim());
+                                }
+                            }
+                            evalResolve(resultText);
+                        });
+                    }, querySelector)) as string[];
+                resolve(elementTexts);
+            },
+        );
     }
+
     public getAttribute(querySelector: string, attributeName: string): Promise<string> {
         throw new Error('Method not implemented.');
     }
@@ -49,9 +112,23 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
         throw new Error('Method not implemented.');
     }
     public raw(): puppeteer.Page {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return (this.request as PuppeteerRequest).getPage();
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
+
     public dispose(): Promise<void> {
-        throw new Error('Method not implemented.');
+        return new Promise(
+            async (resolve): Promise<void> => {
+                if (this.request !== null) {
+                    await (this.request as PuppeteerRequest).dispose();
+                    this.request = null;
+                }
+                await this.manager.dispose();
+                resolve();
+            },
+        );
     }
 }
