@@ -126,17 +126,111 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
             throw new CoreNotInitializedError();
         }
     }
+
     public getAttributeAll(querySelector: string, attributeName: string): Promise<string[]> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let elementAttributes: string[] = (await (this.request as PuppeteerRequest).getPage().evaluate(
+                        function(selector: string, selectedAttribute: string): Promise<string[]> {
+                            return new Promise((evalResolve): void => {
+                                let attributeValues: string[] = [];
+                                let elements: NodeListOf<Element> | null = document.querySelectorAll(querySelector);
+                                for (var i = 0; i < elements.length; i++) {
+                                    let element = elements[i];
+                                    let attrVal = element.getAttribute(selectedAttribute)
+                                        ? (element.getAttribute(selectedAttribute) as string).trim()
+                                        : '';
+                                    attributeValues.push(attrVal);
+                                }
+                                evalResolve(attributeValues);
+                            });
+                        },
+                        querySelector,
+                        attributeName,
+                    )) as string[];
+                    resolve(elementAttributes);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
+
     public getHtml(querySelector: string): Promise<string> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let htmlVal: string = await (this.request as PuppeteerRequest)
+                        .getPage()
+                        .evaluate(function(selector: string): Promise<string> {
+                            return new Promise(
+                                async (evalResolve): Promise<void> => {
+                                    let element: Element | null = document.querySelector(selector);
+                                    let elementHtml = '';
+                                    if (element) {
+                                        elementHtml = element.outerHTML.trim();
+                                    }
+                                    evalResolve(elementHtml);
+                                },
+                            );
+                        }, querySelector);
+
+                    resolve(htmlVal);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
+
     public getHtmlAll(querySelector: string): Promise<string[]> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let htmlVal: string[] = await (this.request as PuppeteerRequest)
+                        .getPage()
+                        .evaluate(function(selector: string): Promise<string[]> {
+                            return new Promise(
+                                async (evalResolve): Promise<void> => {
+                                    let elementHtmls: string[] = [];
+                                    let elements: NodeListOf<Element> = document.querySelectorAll(selector);
+                                    for (var i = 0; i < elements.length; i++) {
+                                        let element = elements[i];
+                                        elementHtmls.push(element.outerHTML);
+                                    }
+                                    evalResolve(elementHtmls);
+                                },
+                            );
+                        }, querySelector);
+                    resolve(htmlVal);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
     public elementExist(querySelector: string): Promise<boolean> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let elementExist = false;
+                    try {
+                        // attempt to wait for the element to pop up via selector.If the timeout exceeds, it fails
+                        await (this.request as PuppeteerRequest).getPage().waitForSelector(querySelector, {
+                            timeout: 1000,
+                        });
+                        elementExist = true;
+                    } catch {
+                        // waiting for the selector failed. Element does not exist
+                        elementExist = false;
+                    }
+                    resolve(elementExist);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
     public elementCount(querySelector: string): Promise<number> {
         throw new Error('Method not implemented.');
