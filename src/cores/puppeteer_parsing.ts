@@ -1,6 +1,6 @@
 import { PuppeteerRequest, PuppeteerManager } from 'request-group-puppeteer';
 import { ParsingCore } from '../web_scraping_engine';
-import { CoreNotInitializedError, CoreError } from '../core_errors';
+import { CoreNotInitializedError } from '../core_errors';
 import * as puppeteer from 'puppeteer';
 
 /**
@@ -102,7 +102,29 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
     }
 
     public getAttribute(querySelector: string, attributeName: string): Promise<string> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let elementAttribute: string = (await (this.request as PuppeteerRequest).getPage().evaluate(
+                        function(selector: string, selectedAttribute: string): Promise<string> {
+                            return new Promise((evalResolve): void => {
+                                let element: Element | null = document.querySelector(querySelector);
+                                let attributeVal: string =
+                                    element && element.getAttribute(selectedAttribute)
+                                        ? (element.getAttribute(selectedAttribute) as string)
+                                        : '';
+                                evalResolve(attributeVal);
+                            });
+                        },
+                        querySelector,
+                        attributeName,
+                    )) as string;
+                    resolve(elementAttribute);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
     public getAttributeAll(querySelector: string, attributeName: string): Promise<string[]> {
         throw new Error('Method not implemented.');
