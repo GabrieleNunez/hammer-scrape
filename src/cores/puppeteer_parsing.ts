@@ -46,48 +46,56 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
     }
 
     public getText(querySelector: string): Promise<string> {
-        return new Promise(
-            async (resolve): Promise<void> => {
-                let elementText: string = (await (this.request as PuppeteerRequest)
-                    .getPage()
-                    .evaluate(function(selector: string): Promise<string> {
-                        return new Promise((evalResolve): void => {
-                            let resultText = '';
-                            let elementResult: Element | null = document.querySelector(selector);
-                            if (elementResult) {
-                                resultText = elementResult.textContent ? elementResult.textContent.trim() : '';
-                            } else {
-                                resultText = '';
-                            }
-                            evalResolve(resultText);
-                        });
-                    }, querySelector)) as string;
-                resolve(elementText);
-            },
-        );
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let elementText: string = (await (this.request as PuppeteerRequest)
+                        .getPage()
+                        .evaluate(function(selector: string): Promise<string> {
+                            return new Promise((evalResolve): void => {
+                                let resultText = '';
+                                let elementResult: Element | null = document.querySelector(selector);
+                                if (elementResult) {
+                                    resultText = elementResult.textContent ? elementResult.textContent.trim() : '';
+                                } else {
+                                    resultText = '';
+                                }
+                                evalResolve(resultText);
+                            });
+                        }, querySelector)) as string;
+                    resolve(elementText);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
 
     public getTextAll(querySelector: string): Promise<string[]> {
-        return new Promise(
-            async (resolve): Promise<void> => {
-                let elementTexts: string[] = (await (this.request as PuppeteerRequest)
-                    .getPage()
-                    .evaluate(function(selector: string): Promise<string[]> {
-                        return new Promise((evalResolve): void => {
-                            let resultText: string[] = [];
-                            let elements: NodeListOf<Element> | null = document.querySelectorAll(selector);
-                            for (var i = 0; i < elements.length; i++) {
-                                let element: Element = elements[i];
-                                if (element.textContent && element.textContent.trim().length > 0) {
-                                    resultText.push(element.textContent.trim());
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let elementTexts: string[] = (await (this.request as PuppeteerRequest)
+                        .getPage()
+                        .evaluate(function(selector: string): Promise<string[]> {
+                            return new Promise((evalResolve): void => {
+                                let resultText: string[] = [];
+                                let elements: NodeListOf<Element> | null = document.querySelectorAll(selector);
+                                for (var i = 0; i < elements.length; i++) {
+                                    let element: Element = elements[i];
+                                    if (element.textContent && element.textContent.trim().length > 0) {
+                                        resultText.push(element.textContent.trim());
+                                    }
                                 }
-                            }
-                            evalResolve(resultText);
-                        });
-                    }, querySelector)) as string[];
-                resolve(elementTexts);
-            },
-        );
+                                evalResolve(resultText);
+                            });
+                        }, querySelector)) as string[];
+                    resolve(elementTexts);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
 
     public getAttribute(querySelector: string, attributeName: string): Promise<string> {
