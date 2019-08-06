@@ -161,7 +161,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
         if (this.isInitialized()) {
             return new Promise(
                 async (resolve): Promise<void> => {
-                    let htmlVal: string = await (this.request as PuppeteerRequest)
+                    let htmlVal: string = (await (this.request as PuppeteerRequest)
                         .getPage()
                         .evaluate(function(selector: string): Promise<string> {
                             return new Promise(
@@ -174,7 +174,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
                                     evalResolve(elementHtml);
                                 },
                             );
-                        }, querySelector);
+                        }, querySelector)) as string;
 
                     resolve(htmlVal);
                 },
@@ -188,7 +188,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
         if (this.isInitialized()) {
             return new Promise(
                 async (resolve): Promise<void> => {
-                    let htmlVal: string[] = await (this.request as PuppeteerRequest)
+                    let htmlVal: string[] = (await (this.request as PuppeteerRequest)
                         .getPage()
                         .evaluate(function(selector: string): Promise<string[]> {
                             return new Promise(
@@ -202,7 +202,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
                                     evalResolve(elementHtmls);
                                 },
                             );
-                        }, querySelector);
+                        }, querySelector)) as string[];
                     resolve(htmlVal);
                 },
             );
@@ -232,11 +232,65 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
             throw new CoreNotInitializedError();
         }
     }
+
     public elementCount(querySelector: string): Promise<number> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let elementCounts = 0;
+                    elementCounts = (await (this.request as PuppeteerRequest)
+                        .getPage()
+                        .evaluate(function(selector: string): Promise<number> {
+                            return new Promise((evalResolve): void => {
+                                let totalElements = 0;
+                                let elements = document.querySelectorAll(selector);
+                                totalElements = elements.length;
+                                evalResolve(totalElements);
+                            });
+                        }, querySelector)) as number;
+                    resolve(elementCounts);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
+
     public getSelectOptions(querySelector: string): Promise<{ text: string; value: string }[]> {
-        throw new Error('Method not implemented.');
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let selectOptions: { text: string; value: string }[] = [];
+                    selectOptions = (await (this.request as PuppeteerRequest)
+                        .getPage()
+                        .evaluate(function(selector: string): Promise<{ text: string; value: string }[]> {
+                            return new Promise((evalResolve): void => {
+                                let options: { text: string; value: string }[] = [];
+                                let selectElement = document.querySelector(selector);
+                                if (selectElement) {
+                                    let optionElements: NodeListOf<Element> = selectElement.querySelectorAll('option');
+                                    for (var i = 0; i < optionElements.length; i++) {
+                                        let option = optionElements[i];
+                                        let text = option.textContent ? (option.textContent as string).trim() : '';
+                                        let val = option.getAttribute('value')
+                                            ? (option.getAttribute('value') as string).trim()
+                                            : '';
+                                        // pushing parsed options
+                                        options.push({
+                                            text: text,
+                                            value: val,
+                                        });
+                                    }
+                                }
+                                evalResolve(options);
+                            });
+                        }, querySelector)) as { text: string; value: string }[];
+                    resolve(selectOptions);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
     public raw(): puppeteer.Page {
         if (this.isInitialized()) {
