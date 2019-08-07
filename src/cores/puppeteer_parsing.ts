@@ -319,3 +319,5 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
         );
     }
 }
+
+export default PuppeteerParsingCore;

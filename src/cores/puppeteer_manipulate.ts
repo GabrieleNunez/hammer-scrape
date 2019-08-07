@@ -116,3 +116,5 @@ export class PuppeteerManipulatingCore extends ManipulationCore<
         );
     }
 }
+
+export default PuppeteerManipulatingCore;
