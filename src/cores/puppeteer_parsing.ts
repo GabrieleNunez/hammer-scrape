@@ -7,21 +7,20 @@ import * as puppeteer from 'puppeteer';
  * The configuration we expect to be utilizing
  */
 export interface PuppeteerParsingCoreConfiguration {
-    reserved: unknown;
+    sharedRequest: PuppeteerRequest | null;
 }
 
 /**
  * Default configuration options for this parsing core
  */
 export const PUPPETEER_PARSING_CORE_DEFAULT: PuppeteerParsingCoreConfiguration = {
-    reserved: false,
+    sharedRequest: null,
 };
 
 export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerParsingCoreConfiguration> {
     private request: PuppeteerRequest | null;
     private manager: PuppeteerManager;
     private initialized: boolean;
-    private reserved: unknown;
 
     public constructor(url: string) {
         super(url);
@@ -31,7 +30,6 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
             width: 1920,
             height: 1080,
         });
-        this.reserved = null;
     }
 
     private isInitialized(): boolean {
@@ -41,8 +39,16 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
     public initialize(data: PuppeteerParsingCoreConfiguration = PUPPETEER_PARSING_CORE_DEFAULT): Promise<void> {
         return new Promise(
             async (resolve): Promise<void> => {
-                await this.manager.initialize();
-                this.reserved = data.reserved;
+                if (this.isInitialized()) {
+                    resolve();
+                } else {
+                    if (data.sharedRequest !== null) {
+                        this.request = data.sharedRequest;
+                        this.manager = data.sharedRequest.getManager();
+                    }
+                    // as of request-group-puppeteer version 1.2.0 there is no need to worry about reinitializing the puppeteer instance
+                    await this.manager.initialize();
+                }
                 resolve();
             },
         );

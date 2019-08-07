@@ -18,7 +18,7 @@
   "homepage": "https://github.com/GabrieleNunez/hammer-scrape#readme",
   "devDependencies": {
     "@types/cheerio": "^0.22.12",
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.7.0",
     "@types/puppeteer": "^1.19.0",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
@@ -30,8 +30,8 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
-    "request-group": "^1.1.0",
-    "request-group-cheerio": "^1.1.0",
-    "request-group-puppeteer": "^1.0.11"
+    "request-group": "^1.2.0",
+    "request-group-cheerio": "^1.2.0",
+    "request-group-puppeteer": "^1.2.0"
   }
 }
