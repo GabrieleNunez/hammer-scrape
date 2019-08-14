@@ -15,3 +15,9 @@ export class CoreNotInitializedError extends CoreError {
         super('Core is not initialized. Please call core.initialize() first');
     }
 }
+
+export class CoreRequestNotCreatedError extends CoreError {
+    public constructor() {
+        super('Core has not yet created the request');
+    }
+}

@@ -224,6 +224,11 @@ export abstract class ManipulationCore<PageType, ExpectedInitializeObjectType>
 
     /** Frees up any resources */
     public abstract dispose(): Promise<void>;
+
+    /**
+     * Get the entire html of the page and return it in a single string
+     */
+    public abstract getDocumentHtml(): Promise<string>;
 }
 
 /**
@@ -310,7 +315,14 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
         }[]
     >;
 
-    // gets the direct page core for more advanced usage
+    /**
+     * Get the entire html of the page and return it in a single string
+     */
+    public abstract getDocumentHtml(): Promise<string>;
+
+    /**
+     * Grab the raw page type to read from
+     */
     public abstract raw(): PageType;
 
     /** Frees up any resources */

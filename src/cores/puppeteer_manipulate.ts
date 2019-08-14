@@ -1,6 +1,6 @@
 import { PuppeteerRequest, PuppeteerManager } from 'request-group-puppeteer';
 import { ManipulationCore } from '../web_scraping_engine';
-import { CoreNotInitializedError } from '../core_errors';
+import { CoreNotInitializedError, CoreRequestNotCreatedError } from '../core_errors';
 import * as puppeteer from 'puppeteer';
 
 /**
@@ -37,6 +37,14 @@ export class PuppeteerManipulatingCore extends ManipulationCore<
 
     private isInitialized(): boolean {
         return this.initialized;
+    }
+
+    public getRequest(): PuppeteerRequest {
+        if (this.request !== null) {
+            return this.request;
+        } else {
+            throw new CoreRequestNotCreatedError();
+        }
     }
 
     public initialize(data: PuppeteerManipulatingCoreConfiguration): Promise<void> {
@@ -114,6 +122,19 @@ export class PuppeteerManipulatingCore extends ManipulationCore<
                 resolve();
             },
         );
+    }
+
+    public getDocumentHtml(): Promise<string> {
+        if (this.isInitialized()) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    let html: string = await this.raw().evaluate((): string => document.body.outerHTML);
+                    resolve(html);
+                },
+            );
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
 }
 

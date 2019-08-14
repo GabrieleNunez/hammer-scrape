@@ -211,6 +211,19 @@ export class CheerioParsingCore extends ParsingCore<CheerioStatic, CheerioParsin
             throw new CoreNotInitializedError();
         }
     }
+
+    public getDocumentHtml(): Promise<string> {
+        if (this.isInitialized()) {
+            return new Promise((resolve): void => {
+                let html: string = this.raw()
+                    .root()
+                    .html() as string;
+                resolve(html);
+            });
+        } else {
+            throw new CoreNotInitializedError();
+        }
+    }
 }
 
 export default CheerioParsingCore;
