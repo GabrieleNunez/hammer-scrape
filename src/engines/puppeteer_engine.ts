@@ -30,6 +30,7 @@ export class PuppeteerEngine extends WebScrapingEngine<PuppeteerParsingCore, Pup
                     await puppeteerManipulating.initialize({
                         sharedRequest: this.parsingCore.getRequest(),
                     });
+                    this.manipulationCore = puppeteerManipulating;
 
                     this.setEngineMode(EngineMode.Idling);
                     resolve();
@@ -39,7 +40,22 @@ export class PuppeteerEngine extends WebScrapingEngine<PuppeteerParsingCore, Pup
             throw new EngineCannotSwitchModeError();
         }
     }
+
     public shutoff(): Promise<void> {
-        throw new Error('Method not implemented.');
+        return new Promise(
+            async (resolve): Promise<void> => {
+                if (this.parsingCore !== null) {
+                    await this.parsingCore.dispose();
+                    this.parsingCore = null;
+                }
+
+                if (this.manipulationCore !== null) {
+                    await this.manipulationCore.dispose();
+                    this.manipulationCore = null;
+                }
+
+                resolve();
+            },
+        );
     }
 }
