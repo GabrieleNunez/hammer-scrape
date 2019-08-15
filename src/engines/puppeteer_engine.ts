@@ -7,6 +7,10 @@ import EngineMode from '../engine_mode';
 import { EngineCannotSwitchModeError } from '../engine_errors';
 
 export class PuppeteerEngine extends WebScrapingEngine<PuppeteerParsingCore, PuppeteerManipulatingCore> {
+    public constructor() {
+        super(EngineType.Fixed, EngineCoreType.Puppeteer);
+    }
+
     protected load(): Promise<void> {
         return new Promise((resolve): void => {
             this.parsingCore = null;
@@ -14,6 +18,7 @@ export class PuppeteerEngine extends WebScrapingEngine<PuppeteerParsingCore, Pup
             resolve();
         });
     }
+
     public process(url: string): Promise<void> {
         if (this.isCorrectEngineMode(EngineMode.Idling)) {
             return new Promise(
