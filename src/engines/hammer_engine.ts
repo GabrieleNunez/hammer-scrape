@@ -65,6 +65,23 @@ export class HammerEngine extends WebScrapingEngine<
             throw new EngineCannotSwitchModeError();
         }
     }
+
+    public parse<T extends PuppeteerParsingCore | CheerioParsingCore>(
+        callback: (core: T) => Promise<void>,
+    ): Promise<void> {
+        if (this.isCorrectEngineMode(EngineMode.Idling)) {
+            return new Promise((resolve): void => {
+                this.setEngineMode(EngineMode.Parsing);
+                callback(this.getParsingCore() as T).then((): void => {
+                    this.setEngineMode(EngineMode.Idling);
+                    resolve();
+                });
+            });
+        } else {
+            throw new EngineCannotSwitchModeError();
+        }
+    }
+
     public shutoff(): Promise<void> {
         return new Promise(
             async (resolve): Promise<void> => {

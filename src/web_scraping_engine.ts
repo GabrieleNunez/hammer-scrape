@@ -245,6 +245,9 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
         this.url = url;
     }
 
+    /**
+     * Get the url that was passed at the time of creation
+     */
     public getUrl(): string {
         return this.url;
     }
