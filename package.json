@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "request-group": "^1.2.0",
-    "request-group-cheerio": "^1.3.5",
+    "request-group-cheerio": "^1.3.6",
     "request-group-puppeteer": "^1.3.0"
   }
 }
