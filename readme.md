@@ -85,3 +85,13 @@ main().then((): void => {
 });
 
 ```
+
+
+## Can Hammer Scrape parse websites that are dynamic?
+
+YES! This portion is powered by Puppeteer. if the peek/ping selector cannot be found a Puppeteer instance will be created thatway you can use a headless browser to interface with the site. All element manipulations are doing using puppeteer. If you are using the  CheerioEngine you cannot manipulate a page, thats the nature of cheerio. Its a parser not a manipulation method. Puppeteer can handle both
+
+
+## You support Cheerio, can you load xml documents in? 
+
+The capability is there, but the implementation is not hooked in at this moment. This will come very soon in the next minor build
