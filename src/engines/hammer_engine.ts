@@ -33,6 +33,13 @@ export class HammerEngine extends WebScrapingEngine<
         });
     }
 
+    /**
+     * Gets a boolean that indicates if we are using puppeteer to additionally parse the page
+     */
+    public usingPuppeteerParse(): boolean {
+        return this.usingPuppeteer ? true : false;
+    }
+
     public process(url: string): Promise<void> {
         if (this.isCorrectEngineMode(EngineMode.Idling)) {
             return new Promise(
