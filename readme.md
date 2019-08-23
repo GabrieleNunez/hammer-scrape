@@ -4,7 +4,7 @@ Let's be honest here, web scraping isn't an art form. It's literally hitting the
 
 ## BUT WAIT I DON'T HAVE THAT LUXURY!
 
-Well then, have you found a great library to simplify the process of parsing and automating actions on web pages then. Thanks to *Cheerio* and *Puppeteer* I've developed a streamlined library to take much of that pain away. 
+Great news, you've found a great library to simplify the process of parsing and automating actions on web pages then. Thanks to *Cheerio* and *Puppeteer* I've developed a streamlined library to take much of that pain away. 
 
 - - - -
 
