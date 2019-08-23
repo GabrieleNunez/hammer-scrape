@@ -50,15 +50,13 @@ function main(): Promise<void> {
             let engine: HammerEngine = new HammerEngine('table.files tr.js-navigation-item td.content span a');
             await engine.startup();
 
-            console.log(engine.getEngineMode());
             console.log('Now processing hammer scrape repository');
             await engine.process('https://github.com/GabrieleNunez/hammer-scrape');
-            console.log(engine.getEngineMode());
+            
             // our goal is to scrape the file names from this repository
             let files: string[] = [];
 
             // parse the engine and grab the data
-            console.log(engine.getEngineMode());
             console.log('Parsing page');
             await engine.parse(
                 (core): Promise<void> => {
