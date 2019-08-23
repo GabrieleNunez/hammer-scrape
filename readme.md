@@ -9,7 +9,7 @@ Well then, have you found a great library to simplify the process of parsing and
 - - - -
 
 ## Installing
-```
+```bash
 npm install hammer-scrape
 ```
 
@@ -34,3 +34,56 @@ More often then not the most used engine will be the HammerEngine, followed by t
 # Why use Hammer over PuppeteerEngine
 
 The key is how hammer works, the HammerEngine implementation will first attempt to use Cheerio to parse the document and look for what I call a "peek/ping selector". If it can find this selector it will use cheerio to parse out the document and when its time to manipulate the page it will create a puppeteer request. This form of "lazy loading" so to speak makes the startup time much easier and lighter on resources additionally.  If the selector is not found, a puppeteer instance will be launched and shared between the cores. 
+
+- - - -
+
+## Example using Hammer
+
+```typescript
+import HammerEngine from '../engines/hammer_engine';
+
+function main(): Promise<void> {
+    return new Promise(
+        async (resolve): Promise<void> => {
+            console.time('Hammer benchmark');
+            console.log('Starting up engine');
+            let engine: HammerEngine = new HammerEngine('table.files tr.js-navigation-item td.content span a');
+            await engine.startup();
+
+            console.log(engine.getEngineMode());
+            console.log('Now processing hammer scrape repository');
+            await engine.process('https://github.com/GabrieleNunez/hammer-scrape');
+            console.log(engine.getEngineMode());
+            // our goal is to scrape the file names from this repository
+            let files: string[] = [];
+
+            // parse the engine and grab the data
+            console.log(engine.getEngineMode());
+            console.log('Parsing page');
+            await engine.parse(
+                (core): Promise<void> => {
+                    return new Promise(
+                        async (resolve): Promise<void> => {
+                            files = await core.getTextAll('table.files tr.js-navigation-item td.content span a');
+                            resolve();
+                        },
+                    );
+                },
+            );
+
+            console.log('Top directory files');
+            console.log(files);
+
+            console.log('Shutting engine off');
+            await engine.shutoff();
+            console.timeEnd('Hammer benchmark');
+            resolve();
+        },
+    );
+}
+
+main().then((): void => {
+    console.log('Completed');
+});
+
+```

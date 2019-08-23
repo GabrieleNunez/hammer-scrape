@@ -18,6 +18,7 @@
 		"node_modules",
         "./src/env.sample.ts",
         "./src/example.ts",
+        "./src/examples"
     ],
 }
 
