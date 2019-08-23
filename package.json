@@ -33,5 +33,15 @@
     "request-group": "^1.2.0",
     "request-group-cheerio": "^1.3.6",
     "request-group-puppeteer": "^1.3.0"
-  }
+  },
+  "keywords": [
+      "hammer",
+      "scrape",
+      "web scraping",
+      "streamline",
+      "request",
+      "cheerio",
+      "puppeteer",
+      "typescript"
+  ]
 }
