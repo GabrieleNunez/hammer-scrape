@@ -237,7 +237,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
                     try {
                         // attempt to wait for the element to pop up via selector.If the timeout exceeds, it fails
                         await (this.request as PuppeteerRequest).getPage().waitForSelector(querySelector, {
-                            timeout: 1000,
+                            timeout: 10000,
                         });
                         elementExist = true;
                     } catch {
