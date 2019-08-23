@@ -47,15 +47,20 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
     public initialize(data: PuppeteerParsingCoreConfiguration = PUPPETEER_PARSING_CORE_DEFAULT): Promise<void> {
         return new Promise(
             async (resolve): Promise<void> => {
-                if (this.isInitialized()) {
-                    resolve();
-                } else {
+                if (!this.isInitialized()) {
                     if (data.sharedRequest !== null) {
                         this.request = data.sharedRequest;
                         this.manager = data.sharedRequest.getManager();
                     }
+
                     // as of request-group-puppeteer version 1.2.0 there is no need to worry about reinitializing the puppeteer instance
                     await this.manager.initialize();
+
+                    if (data.sharedRequest === null) {
+                        this.request = new PuppeteerRequest(this.getUrl(), this.manager);
+                        await this.request.run();
+                    }
+                    this.initialized = true;
                 }
                 resolve();
             },
@@ -321,7 +326,10 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
                     await (this.request as PuppeteerRequest).dispose();
                     this.request = null;
                 }
-                await this.manager.dispose();
+
+                if (this.manager !== null) {
+                    await (this.manager as PuppeteerManager).dispose();
+                }
                 resolve();
             },
         );

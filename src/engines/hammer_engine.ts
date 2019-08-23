@@ -100,3 +100,5 @@ export class HammerEngine extends WebScrapingEngine<
         );
     }
 }
+
+export default HammerEngine;

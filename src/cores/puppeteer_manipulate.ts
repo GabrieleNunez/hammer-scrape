@@ -50,15 +50,20 @@ export class PuppeteerManipulatingCore extends ManipulationCore<
     public initialize(data: PuppeteerManipulatingCoreConfiguration): Promise<void> {
         return new Promise(
             async (resolve): Promise<void> => {
-                if (this.isInitialized()) {
-                    resolve();
-                } else {
+                if (!this.isInitialized()) {
                     if (data.sharedRequest !== null) {
                         this.request = data.sharedRequest;
                         this.manager = data.sharedRequest.getManager();
                     }
+
                     // as of request-group-puppeteer version 1.2.0 there is no need to worry about reinitializing the puppeteer instance
                     await this.manager.initialize();
+
+                    if (data.sharedRequest === null) {
+                        this.request = new PuppeteerRequest(this.getUrl(), this.manager);
+                        await this.request.run();
+                    }
+                    this.initialized = true;
                 }
                 resolve();
             },
@@ -114,9 +119,15 @@ export class PuppeteerManipulatingCore extends ManipulationCore<
         return new Promise(
             async (resolve): Promise<void> => {
                 if (this.isInitialized()) {
-                    await (this.request as PuppeteerRequest).dispose();
-                    await (this.manager as PuppeteerManager).dispose();
-                    this.request = null;
+                    if (this.request !== null) {
+                        await (this.request as PuppeteerRequest).dispose();
+                        this.request = null;
+                    }
+
+                    if (this.manager !== null) {
+                        await (this.manager as PuppeteerManager).dispose();
+                    }
+
                     this.initialized = false;
                 }
                 resolve();

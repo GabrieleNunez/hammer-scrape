@@ -64,3 +64,5 @@ export class PuppeteerEngine extends WebScrapingEngine<PuppeteerParsingCore, Pup
         );
     }
 }
+
+export default PuppeteerEngine;
