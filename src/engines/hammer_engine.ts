@@ -6,6 +6,7 @@ import PuppeteerParsingCore from '../cores/puppeteer_parsing';
 import PuppeteerManipulatingCore from '../cores/puppeteer_parsing';
 import EngineMode from '../engine_mode';
 import { EngineCannotSwitchModeError } from '../engine_errors';
+import { CoreNotInitializedError } from '../core_errors';
 
 export class HammerEngine extends WebScrapingEngine<
     CheerioParsingCore | PuppeteerParsingCore,
@@ -13,11 +14,15 @@ export class HammerEngine extends WebScrapingEngine<
 > {
     /** element ping selector */
     private elementPingSelector: string;
+    private lazy: boolean;
+    private usingPuppeteer: boolean;
 
     /** This serves as our basic */
-    public constructor(elementPingSelector: string) {
+    public constructor(elementPingSelector: string, lazy: boolean = true) {
         super(EngineType.Dynamic, EngineCoreType.CheerioAndPuppeteer);
         this.elementPingSelector = elementPingSelector;
+        this.lazy = lazy;
+        this.usingPuppeteer = false;
     }
 
     protected load(): Promise<void> {
@@ -34,7 +39,7 @@ export class HammerEngine extends WebScrapingEngine<
                 async (resolve): Promise<void> => {
                     this.setEngineMode(EngineMode.Loading);
 
-                    let usingPuppeteer = false;
+                    this.usingPuppeteer = false;
 
                     // we are going to initially try to find the element we want first using cheerio.
                     // if cheerio fails to find it we will load it up using the puppeteer parsing core.
@@ -46,16 +51,21 @@ export class HammerEngine extends WebScrapingEngine<
                     } else {
                         let puppeteerParsingCore: PuppeteerParsingCore = new PuppeteerParsingCore(url);
                         await puppeteerParsingCore.initialize();
-                        usingPuppeteer = true;
+                        this.usingPuppeteer = true;
                         this.parsingCore = puppeteerParsingCore;
                     }
 
-                    // initialize our maniuplation core
-                    let puppeteerManipulatingCore: PuppeteerManipulatingCore = new PuppeteerManipulatingCore(url);
-                    await puppeteerManipulatingCore.initialize({
-                        sharedRequest: usingPuppeteer ? (this.parsingCore as PuppeteerParsingCore).getRequest() : null,
-                    });
-                    this.manipulationCore = puppeteerManipulatingCore;
+                    // when we are in lazy mode, we have no desire to actually create a manipulation core until we absolutely need too
+                    if (!this.lazy) {
+                        // initialize our manipulation core
+                        let puppeteerManipulatingCore: PuppeteerManipulatingCore = new PuppeteerManipulatingCore(url);
+                        await puppeteerManipulatingCore.initialize({
+                            sharedRequest: this.usingPuppeteer
+                                ? (this.parsingCore as PuppeteerParsingCore).getRequest()
+                                : null,
+                        });
+                        this.manipulationCore = puppeteerManipulatingCore;
+                    }
 
                     this.setEngineMode(EngineMode.Idling);
                     resolve();
@@ -77,6 +87,47 @@ export class HammerEngine extends WebScrapingEngine<
                     resolve();
                 });
             });
+        } else {
+            throw new EngineCannotSwitchModeError();
+        }
+    }
+
+    public manipulate(callback: (core: PuppeteerManipulatingCore) => Promise<void>): Promise<void> {
+        if (this.isCorrectEngineMode(EngineMode.Idling)) {
+            return new Promise(
+                async (resolve): Promise<void> => {
+                    // if we are in lazy mode
+                    if (this.lazy) {
+                        if (this.manipulationCore === null && this.parsingCore !== null) {
+                            // initialize our manipulation core
+                            let puppeteerManipulatingCore: PuppeteerManipulatingCore = new PuppeteerManipulatingCore(
+                                this.parsingCore.getUrl(),
+                            );
+                            await puppeteerManipulatingCore.initialize({
+                                sharedRequest: this.usingPuppeteer
+                                    ? (this.parsingCore as PuppeteerParsingCore).getRequest()
+                                    : null,
+                            });
+                            this.manipulationCore = puppeteerManipulatingCore;
+                        } else {
+                            throw new CoreNotInitializedError();
+                        }
+                    }
+
+                    // call the original manipulate method which will handle setting the proper modes
+                    await super.manipulate(callback);
+
+                    // if we are using cheerio as our parsing engine we need to rebuild the page data that we are working on
+                    if (!this.usingPuppeteer) {
+                        let html = await (this.manipulationCore as PuppeteerManipulatingCore).getDocumentHtml();
+                        // we are going to initially try to find the element we want first using cheerio.
+                        // if cheerio fails to find it we will load it up using the puppeteer parsing core.
+                        (this.parsingCore as CheerioParsingCore).getRequest().runFromHtml(html);
+                    }
+
+                    resolve();
+                },
+            );
         } else {
             throw new EngineCannotSwitchModeError();
         }

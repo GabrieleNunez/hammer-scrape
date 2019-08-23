@@ -8,6 +8,8 @@ import { CoreNotInitializedError } from '../core_errors';
 export interface CheerioParsingCoreConfiguration {
     header?: string;
     xml?: boolean;
+    reinitialize?: boolean;
+    html?: string;
 }
 
 /**
@@ -16,6 +18,8 @@ export interface CheerioParsingCoreConfiguration {
 export const CHEERIO_PARSING_CORE_DEFAULT: CheerioParsingCoreConfiguration = {
     xml: false,
     header: undefined,
+    reinitialize: false,
+    html: '',
 };
 
 /**
@@ -40,6 +44,14 @@ export class CheerioParsingCore extends ParsingCore<CheerioStatic, CheerioParsin
             this.initialized = false;
             resolve();
         });
+    }
+
+    public getRequest(): CheerioRequest {
+        if (this.isInitialized()) {
+            return this.request as CheerioRequest;
+        } else {
+            throw new CoreNotInitializedError();
+        }
     }
 
     public initialize(data: CheerioParsingCoreConfiguration = CHEERIO_PARSING_CORE_DEFAULT): Promise<void> {
