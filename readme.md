@@ -40,7 +40,7 @@ The key is how hammer works, the HammerEngine implementation will first attempt 
 ## Example using Hammer
 
 ```typescript
-import HammerEngine from '../engines/hammer_engine';
+import HammerEngine from 'hammer-scrape';
 
 function main(): Promise<void> {
     return new Promise(
@@ -52,7 +52,7 @@ function main(): Promise<void> {
 
             console.log('Now processing hammer scrape repository');
             await engine.process('https://github.com/GabrieleNunez/hammer-scrape');
-            
+
             // our goal is to scrape the file names from this repository
             let files: string[] = [];
 
