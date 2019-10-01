@@ -229,7 +229,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
             throw new CoreNotInitializedError();
         }
     }
-    public elementExist(querySelector: string): Promise<boolean> {
+    public elementExist(querySelector: string, timeout?: number): Promise<boolean> {
         if (this.isInitialized()) {
             return new Promise(
                 async (resolve): Promise<void> => {
@@ -237,7 +237,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
                     try {
                         // attempt to wait for the element to pop up via selector.If the timeout exceeds, it fails
                         await (this.request as PuppeteerRequest).getPage().waitForSelector(querySelector, {
-                            timeout: 10000,
+                            timeout: timeout ? timeout : 10000,
                         });
                         elementExist = true;
                     } catch {

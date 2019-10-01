@@ -298,7 +298,17 @@ export abstract class ParsingCore<PageType, ExpectedInitializeObjectType>
     /**
      * Determines if an element does exist on the current DOM Tree
      */
-    public abstract elementExist(querySelector: string): Promise<boolean>;
+    public abstract elementExist(querySelector: string, timeout?: number): Promise<boolean>;
+
+    /**
+     * Wait for a timeout operation, return a promise that completes when the timeout is done
+     * @param timeoutInterval
+     */
+    public waitForTimeout(timeoutInterval: number): Promise<void> {
+        return new Promise((resolve): void => {
+            setTimeout(resolve, timeoutInterval);
+        });
+    }
 
     /**
      * Counts the total amount of elements that match the selector
