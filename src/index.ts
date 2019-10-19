@@ -14,15 +14,18 @@ export * from './web_scraping_engine';
 // default export will be the hammer engine
 import HammerEngine from './engines/hammer_engine';
 import { Request, BaseWebRequest } from 'request-group';
+import { PuppeteerManager } from 'request-group-puppeteer';
 
 /** Quick and Dirty hammer request
  * @todo Find a a way to share puppeteer manager instances between multiple hammer request. Right now this is really inefficiant
  */
 export class HammerRequest extends BaseWebRequest<HammerEngine> {
     protected pingSelector: string;
-    public constructor(url: string, pingSelector: string) {
+    protected sharedManager: PuppeteerManager | undefined;
+    public constructor(url: string, pingSelector: string, sharedManager?: PuppeteerManager) {
         super(url);
         this.pingSelector = pingSelector;
+        this.sharedManager = sharedManager;
     }
 
     public async dispose(): Promise<void> {
@@ -34,7 +37,7 @@ export class HammerRequest extends BaseWebRequest<HammerEngine> {
 
     public async run(): Promise<Request<HammerEngine>> {
         if (!this.pageData) {
-            this.pageData = new HammerEngine(this.pingSelector);
+            this.pageData = new HammerEngine(this.pingSelector, true, this.sharedManager);
             await this.pageData.startup();
         }
         // process a url
