@@ -8,6 +8,7 @@ import EngineMode from '../engine_mode';
 import { EngineCannotSwitchModeError } from '../engine_errors';
 import { CoreNotInitializedError } from '../core_errors';
 import { PuppeteerManager } from 'request-group-puppeteer';
+import { ifError } from 'assert';
 
 export class HammerEngine extends WebScrapingEngine<
     CheerioParsingCore | PuppeteerParsingCore,
@@ -19,15 +20,22 @@ export class HammerEngine extends WebScrapingEngine<
     private usingPuppeteer: boolean;
     private sharingManager: boolean;
     private sharedManager: PuppeteerManager | undefined;
+    private forceBrowser: boolean;
 
     /** This serves as our basic */
-    public constructor(elementPingSelector: string, lazy: boolean = true, sharedManager?: PuppeteerManager) {
+    public constructor(
+        elementPingSelector: string,
+        lazy: boolean = true,
+        sharedManager?: PuppeteerManager,
+        forceBrowser?: boolean,
+    ) {
         super(EngineType.Dynamic, EngineCoreType.CheerioAndPuppeteer);
         this.elementPingSelector = elementPingSelector;
         this.lazy = lazy;
         this.usingPuppeteer = false;
         this.sharingManager = sharedManager !== undefined;
         this.sharedManager = sharedManager;
+        this.forceBrowser = forceBrowser !== undefined ? (forceBrowser as boolean) : false;
     }
 
     protected load(): Promise<void> {
@@ -53,14 +61,20 @@ export class HammerEngine extends WebScrapingEngine<
 
                     this.usingPuppeteer = false;
 
-                    // we are going to initially try to find the element we want first using cheerio.
-                    // if cheerio fails to find it we will load it up using the puppeteer parsing core.
-                    let cheerioParsingCore: CheerioParsingCore = new CheerioParsingCore(url);
-                    await cheerioParsingCore.initialize();
-                    let elementExist: boolean = await cheerioParsingCore.elementExist(this.elementPingSelector);
-                    if (elementExist) {
-                        this.parsingCore = cheerioParsingCore;
-                    } else {
+                    if (!this.forceBrowser) {
+                        // we are going to initially try to find the element we want first using cheerio.
+                        // if cheerio fails to find it we will load it up using the puppeteer parsing core.
+                        let cheerioParsingCore: CheerioParsingCore = new CheerioParsingCore(url);
+                        await cheerioParsingCore.initialize();
+                        let elementExist: boolean = await cheerioParsingCore.elementExist(this.elementPingSelector);
+                        if (elementExist) {
+                            this.parsingCore = cheerioParsingCore;
+                        } else {
+                            this.forceBrowser = true;
+                        }
+                    }
+
+                    if (this.forceBrowser) {
                         let puppeteerParsingCore: PuppeteerParsingCore = new PuppeteerParsingCore(
                             url,
                             this.sharedManager,
