@@ -22,10 +22,12 @@ import { PuppeteerManager } from 'request-group-puppeteer';
 export class HammerRequest extends BaseWebRequest<HammerEngine> {
     protected pingSelector: string;
     protected sharedManager: PuppeteerManager | undefined;
-    public constructor(url: string, pingSelector: string, sharedManager?: PuppeteerManager) {
+    protected forceBrowser: boolean | undefined;
+    public constructor(url: string, pingSelector: string, sharedManager?: PuppeteerManager, forceBrowser?: boolean) {
         super(url);
         this.pingSelector = pingSelector;
         this.sharedManager = sharedManager;
+        this.forceBrowser = forceBrowser;
     }
 
     public async dispose(): Promise<void> {
@@ -37,7 +39,7 @@ export class HammerRequest extends BaseWebRequest<HammerEngine> {
 
     public async run(): Promise<Request<HammerEngine>> {
         if (!this.pageData) {
-            this.pageData = new HammerEngine(this.pingSelector, true, this.sharedManager);
+            this.pageData = new HammerEngine(this.pingSelector, true, this.sharedManager, this.forceBrowser);
             await this.pageData.startup();
         }
         // process a url

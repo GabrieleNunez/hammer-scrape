@@ -1,6 +1,6 @@
 {
   "name": "hammer-scrape",
-  "version": "1.3.7",
+  "version": "1.3.9",
   "description": "Unifies Cheerio and Puppeteer for the most streamline scraping experience",
   "main": "dist/index.js",
   "scripts": {
