@@ -21,15 +21,20 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
     private request: PuppeteerRequest | null;
     private manager: PuppeteerManager;
     private initialized: boolean;
+    private sharingManager: boolean;
 
-    public constructor(url: string) {
+    public constructor(url: string, sharedManager?: PuppeteerManager) {
         super(url);
         this.request = null;
         this.initialized = false;
-        this.manager = new PuppeteerManager({
-            width: 1920,
-            height: 1080,
-        });
+        this.manager =
+            sharedManager !== undefined
+                ? sharedManager
+                : new PuppeteerManager({
+                      width: 1920,
+                      height: 1080,
+                  });
+        this.sharingManager = sharedManager !== undefined;
     }
 
     private isInitialized(): boolean {
@@ -327,7 +332,7 @@ export class PuppeteerParsingCore extends ParsingCore<puppeteer.Page, PuppeteerP
                     this.request = null;
                 }
 
-                if (this.manager !== null) {
+                if (this.manager !== null && !this.sharingManager) {
                     await (this.manager as PuppeteerManager).dispose();
                 }
                 resolve();

@@ -7,6 +7,7 @@ import PuppeteerManipulatingCore from '../cores/puppeteer_manipulate';
 import EngineMode from '../engine_mode';
 import { EngineCannotSwitchModeError } from '../engine_errors';
 import { CoreNotInitializedError } from '../core_errors';
+import { PuppeteerManager } from 'request-group-puppeteer';
 
 export class HammerEngine extends WebScrapingEngine<
     CheerioParsingCore | PuppeteerParsingCore,
@@ -16,13 +17,17 @@ export class HammerEngine extends WebScrapingEngine<
     private elementPingSelector: string;
     private lazy: boolean;
     private usingPuppeteer: boolean;
+    private sharingManager: boolean;
+    private sharedManager: PuppeteerManager | undefined;
 
     /** This serves as our basic */
-    public constructor(elementPingSelector: string, lazy: boolean = true) {
+    public constructor(elementPingSelector: string, lazy: boolean = true, sharedManager?: PuppeteerManager) {
         super(EngineType.Dynamic, EngineCoreType.CheerioAndPuppeteer);
         this.elementPingSelector = elementPingSelector;
         this.lazy = lazy;
         this.usingPuppeteer = false;
+        this.sharingManager = sharedManager !== undefined;
+        this.sharedManager = sharedManager;
     }
 
     protected load(): Promise<void> {
@@ -56,7 +61,10 @@ export class HammerEngine extends WebScrapingEngine<
                     if (elementExist) {
                         this.parsingCore = cheerioParsingCore;
                     } else {
-                        let puppeteerParsingCore: PuppeteerParsingCore = new PuppeteerParsingCore(url);
+                        let puppeteerParsingCore: PuppeteerParsingCore = new PuppeteerParsingCore(
+                            url,
+                            this.sharedManager,
+                        );
                         await puppeteerParsingCore.initialize();
                         this.usingPuppeteer = true;
                         this.parsingCore = puppeteerParsingCore;
@@ -65,7 +73,10 @@ export class HammerEngine extends WebScrapingEngine<
                     // when we are in lazy mode, we have no desire to actually create a manipulation core until we absolutely need too
                     if (!this.lazy) {
                         // initialize our manipulation core
-                        let puppeteerManipulatingCore: PuppeteerManipulatingCore = new PuppeteerManipulatingCore(url);
+                        let puppeteerManipulatingCore: PuppeteerManipulatingCore = new PuppeteerManipulatingCore(
+                            url,
+                            this.sharedManager,
+                        );
                         await puppeteerManipulatingCore.initialize({
                             sharedRequest: this.usingPuppeteer
                                 ? (this.parsingCore as PuppeteerParsingCore).getRequest()
@@ -109,6 +120,7 @@ export class HammerEngine extends WebScrapingEngine<
                             // initialize our manipulation core
                             let puppeteerManipulatingCore: PuppeteerManipulatingCore = new PuppeteerManipulatingCore(
                                 this.parsingCore.getUrl(),
+                                this.sharedManager,
                             );
                             await puppeteerManipulatingCore.initialize({
                                 sharedRequest: this.usingPuppeteer

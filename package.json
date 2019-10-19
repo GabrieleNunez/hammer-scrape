@@ -1,6 +1,6 @@
 {
   "name": "hammer-scrape",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Unifies Cheerio and Puppeteer for the most streamline scraping experience",
   "main": "dist/index.js",
   "scripts": {
@@ -18,35 +18,35 @@
   "homepage": "https://github.com/GabrieleNunez/hammer-scrape#readme",
   "devDependencies": {
     "@types/cheerio": "^0.22.13",
-    "@types/node": "^12.7.2",
-    "@types/puppeteer": "^1.19.1",
+    "@types/node": "^12.11.1",
+    "@types/puppeteer": "^1.20.2",
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
-    "eslint": "^6.2.1",
-    "eslint-config-prettier": "^6.1.0",
-    "eslint-plugin-prettier": "^3.1.0",
+    "eslint": "^6.5.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.1",
     "prettier": "^1.18.2",
-    "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   },
   "dependencies": {
-    "request-group": "^1.2.0",
-    "request-group-cheerio": "^1.3.6",
+    "request-group": "^1.2.6",
+    "request-group-cheerio": "^1.4.0",
     "request-group-puppeteer": "^1.3.0"
   },
   "keywords": [
-      "hammer",
-      "scrape",
-      "web scraping",
-      "streamline",
-      "request",
-      "cheerio",
-      "puppeteer",
-      "typescript"
+    "hammer",
+    "scrape",
+    "web scraping",
+    "streamline",
+    "request",
+    "cheerio",
+    "puppeteer",
+    "typescript"
   ],
   "files": [
     "/dist",
     "/LICENSE",
     "/readme.md"
-    ]
+  ]
 }
